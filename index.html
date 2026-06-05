@@ -965,15 +965,25 @@ const REVIEW_DATA = {
 function populateWeekSelects() {
   const revSel  = document.getElementById('reviewWeekSelect');
   const quizSel = document.getElementById('quizWeekSelector');
-  [revSel, quizSel].forEach(sel => {
-    sel.innerHTML = '';
-    Object.keys(REVIEW_DATA).forEach(w => {
-      const opt = document.createElement('option');
-      opt.value = w;
-      opt.textContent = REVIEW_DATA[w].label;
-      if (Number(w) === 3) opt.selected = true;
-      sel.appendChild(opt);
-    });
+
+  // Review selector — only weeks that have full REVIEW_DATA
+  revSel.innerHTML = '';
+  Object.keys(REVIEW_DATA).forEach(w => {
+    const opt = document.createElement('option');
+    opt.value = w;
+    opt.textContent = REVIEW_DATA[w].label;
+    if (Number(w) === 3) opt.selected = true;
+    revSel.appendChild(opt);
+  });
+
+  // Quiz selector — every week that has QUIZ_DATA
+  quizSel.innerHTML = '';
+  Object.keys(QUIZ_DATA).forEach(w => {
+    const opt = document.createElement('option');
+    opt.value = w;
+    opt.textContent = `Week ${w}`;
+    if (Number(w) === 1) opt.selected = true;
+    quizSel.appendChild(opt);
   });
 }
 
@@ -1005,12 +1015,13 @@ function toggleRev(i) {
 }
 
 // ═══════════════════════════════════════════
-//  QUIZ DATA
+//  QUIZ DATA  (weeks 1–12)
 // ═══════════════════════════════════════════
 const QUIZ_DATA = {
+  // ── WEEK 1 · Gen 25–30, Matt 25–28, Mark 1–2, Ps 13–15, Pr 13–15, Isa 4, Hos 4 ──
   1:[
     {q:'In Genesis 25, what did Esau trade away to Jacob?',
-     opts:['His coat of many colors','His birthright','His wife Rachel','His flock of sheep'], ans:1,
+     opts:['His coat of many colours','His birthright','His wife Rachel','His flock of sheep'], ans:1,
      exp:'Esau sold his birthright for a bowl of lentil stew — despising his firstborn status (Genesis 25:29-34).'},
     {q:'In Matthew 25, the parable of the Ten Virgins teaches us to be…',
      opts:['Generous with oil','Ready and watchful','Forgiving of enemies','Humble in prayer'], ans:1,
@@ -1028,6 +1039,7 @@ const QUIZ_DATA = {
      opts:['Goes to Jerusalem','Casts out an unclean spirit in the synagogue','Feeds a multitude','Walks on water'], ans:1,
      exp:'In the synagogue at Capernaum, Jesus drove out an unclean spirit — amazing all who witnessed it (Mark 1:23-28).'},
   ],
+  // ── WEEK 2 · Gen 31–36, Mark 3–8, Ps 16–18, Pr 16–18, Isa 5, Hos 5 ──
   2:[
     {q:'At Peniel (Genesis 32), Jacob wrestles all night with whom?',
      opts:['An angel','His brother Esau','Laban his father-in-law','God himself'], ans:3,
@@ -1048,6 +1060,7 @@ const QUIZ_DATA = {
      opts:['The heart','The mind','The tongue','The hand'], ans:2,
      exp:'"Death and life are in the power of the tongue, and those who love it will eat its fruit." (Proverbs 18:21)'},
   ],
+  // ── WEEK 3 · Gen 37–42, Mark 9–14, Ps 19–21, Pr 19–21, Isa 6, Hos 6 ──
   3:[
     {q:'In Genesis 37, why do Joseph\'s brothers hate him?',
      opts:['He stole from them','Their father loved him most and he shared dreams of ruling over them','He refused to work','He married before his older brothers'], ans:1,
@@ -1067,6 +1080,195 @@ const QUIZ_DATA = {
     {q:'Isaiah 6 records the prophet\'s response to God\'s call: "Here am I, ___"',
      opts:['"receive me"','"teach me"','"send me"','"lead me"'], ans:2,
      exp:'After the live coal purifies his lips, Isaiah responds: "Here am I. Send me!" — one of the most celebrated responses to divine calling in Scripture (Isaiah 6:8).'},
+  ],
+  // ── WEEK 4 · Gen 43–48, Mark 15–16, Luke 1–4, Ps 22–24, Pr 22–24, Isa 7, Hos 7 ──
+  4:[
+    {q:'Psalm 23 begins: "The Lord is my shepherd; I shall not ___."',
+     opts:['fear','want','fall','doubt'], ans:1,
+     exp:'"The Lord is my shepherd; I shall not want." (Psalm 23:1) A declaration of complete trust — God provides everything his people need.'},
+    {q:'In Genesis 45, Joseph reveals himself to his brothers. What does he say about being sold into slavery?',
+     opts:['That they must repay him','That God sent him ahead to preserve life','That he has forgiven but not forgotten','That they will serve him in Egypt'], ans:1,
+     exp:'"It was not you who sent me here, but God." Joseph sees God\'s sovereign hand in his suffering, using it to save many lives (Genesis 45:7-8).'},
+    {q:'In Mark 16, what do the women find when they arrive at Jesus\' tomb?',
+     opts:['Roman guards blocking the entrance','The body still wrapped in linen','The stone rolled away and a young man in white inside','Nothing — completely dark and empty'], ans:2,
+     exp:'They found the stone rolled away and a young man in white who said: "He has risen! He is not here." (Mark 16:6) — the resurrection announced.'},
+    {q:'In Luke 1, the angel Gabriel tells Mary she will have a son. What name does he give?',
+     opts:['Emmanuel','Jesus','Joshua','Immanuel'], ans:1,
+     exp:'"You are to call him Jesus." The name means "the Lord saves" — announcing his mission before his birth (Luke 1:31).'},
+    {q:'In Luke 2, what sign do the angels give the shepherds to find the baby Jesus?',
+     opts:['A bright star over the stable','He will be wrapped in cloths and lying in a manger','Wise men will be kneeling beside him','He will be glowing with heavenly light'], ans:1,
+     exp:'"You will find a baby wrapped in cloths and lying in a manger." A humble feeding trough announced the arrival of the King of kings (Luke 2:12).'},
+    {q:'In Luke 4, Jesus reads from Isaiah in the synagogue and declares: "Today this scripture is fulfilled in your ___."',
+     opts:['generation','nation','hearing','presence'], ans:2,
+     exp:'"Today this scripture is fulfilled in your hearing." The crowd marvelled at his words — until he challenged their expectations (Luke 4:21).'},
+  ],
+  // ── WEEK 5 · Gen 49–50, Exod 1–4, Luke 5–10, Ps 25–27, Pr 25–27, Isa 8, Hos 8 ──
+  5:[
+    {q:'In Genesis 49, Jacob blesses his 12 sons before he dies. Which son receives the promise that "the sceptre shall not depart" from him?',
+     opts:['Reuben','Judah','Joseph','Levi'], ans:1,
+     exp:'"The sceptre will not depart from Judah." This prophecy points forward to David — and to Jesus, the Lion of Judah (Genesis 49:10).'},
+    {q:'In Exodus 1, why does Pharaoh command Hebrew baby boys to be killed?',
+     opts:['The Hebrews had rebelled','A prophecy warned a Hebrew king would rise','The Israelites had become so numerous he feared them','They refused to pay tribute'], ans:2,
+     exp:'"Look, the Israelites have become far too numerous for us." Pharaoh feared their growing numbers and potential alliance with Egypt\'s enemies (Exodus 1:9-10).'},
+    {q:'In Exodus 3, God appears to Moses in the wilderness. How does God appear?',
+     opts:['A pillar of fire in the sky','A burning bush that is not consumed by the flames','A still small voice from a cave','A mighty wind and earthquake'], ans:1,
+     exp:'"Though the bush was on fire, it did not burn up." Moses hid his face, afraid to look at God (Exodus 3:2-3) — the first great appearance of God in the Exodus story.'},
+    {q:'In Luke 5, after the miraculous catch of fish, Jesus tells Simon Peter: "From now on you will…"',
+     opts:['lead the twelve apostles','fish for people','be called the Rock','go to Jerusalem'], ans:1,
+     exp:'"From now on you will fish for people." Peter left everything and followed — his fishing skills would now serve the kingdom (Luke 5:10-11).'},
+    {q:'In Luke 9, who appears with Jesus at the Transfiguration on the mountain?',
+     opts:['Abraham and Isaac','Moses and Elijah','David and Isaiah','John the Baptist and Elisha'], ans:1,
+     exp:'Moses (representing the Law) and Elijah (representing the Prophets) appeared with Jesus and spoke about his coming "departure" in Jerusalem (Luke 9:30-31).'},
+    {q:'Psalm 27:4 — What is the ONE thing David says he desires above all else?',
+     opts:['Victory over all his enemies','To dwell in the house of the Lord all the days of his life','Long life and many descendants','Wisdom greater than Solomon\'s'], ans:1,
+     exp:'"One thing I ask from the Lord… that I may dwell in the house of the Lord all the days of my life, to gaze on the beauty of the Lord." (Psalm 27:4) — an undivided heart.'},
+  ],
+  // ── WEEK 6 · Exod 5–10, Luke 11–16, Ps 28–30, Pr 28–30, Isa 9, Hos 9 ──
+  6:[
+    {q:'In Luke 15, Jesus tells the parable of the Prodigal Son. When the son returns, what does the father do?',
+     opts:['He scolds him for wasting his inheritance','He runs to meet him, embraces him, and throws a feast','He makes him work as a hired servant','He waits inside for him to come and knock'], ans:1,
+     exp:'"While he was still a long way off, his father saw him and was filled with compassion; he ran to his son, threw his arms around him and kissed him." A picture of God\'s welcome (Luke 15:20).'},
+    {q:'Exodus 7–10 describes plagues on Egypt. Which of these is NOT one of the ten plagues?',
+     opts:['Frogs','Locusts','Lions','Darkness'], ans:2,
+     exp:'The ten plagues were: blood, frogs, gnats, flies, livestock disease, boils, hail, locusts, darkness, and death of firstborns. Lions were never a plague.'},
+    {q:'Isaiah 9:6 is a famous prophecy. Which of these is NOT one of the names given to the promised child?',
+     opts:['Wonderful Counsellor','Mighty God','Prince of Peace','King of Kings'], ans:3,
+     exp:'Isaiah 9:6 names him "Wonderful Counsellor, Mighty God, Everlasting Father, Prince of Peace." "King of Kings" is in Revelation — not in this verse.'},
+    {q:'Psalm 30:5 contains a beautiful promise. "Weeping may stay for the night, but ___ comes in the morning."',
+     opts:['peace','rejoicing','strength','light'], ans:1,
+     exp:'"Weeping may stay for the night, but rejoicing comes in the morning." (Psalm 30:5) — a promise that God\'s mercies are new every morning.'},
+    {q:'In Luke 11, Jesus teaches about prayer. What does he promise about those who ask, seek, and knock?',
+     opts:['They will receive great riches','Everyone who asks receives; who seeks finds; who knocks, the door is opened','They must persist for seven days','Their prayers are heard only through the priests'], ans:1,
+     exp:'"Everyone who asks receives; the one who seeks finds; and to the one who knocks, the door will be opened." Persistent faith in prayer is always rewarded (Luke 11:10).'},
+    {q:'In Luke 16, what separates the rich man in torment from Lazarus in paradise?',
+     opts:['A wall of fire','A great chasm that no one can cross','A river of water','Angels with flaming swords'], ans:1,
+     exp:'"Between us and you a great chasm has been set in place, so that those who want to go from here to you cannot." The choices we make in this life have eternal consequences (Luke 16:26).'},
+  ],
+  // ── WEEK 7 · Exod 11–16, Luke 17–22, Ps 31–33, Pr 31, Isa 10, Hos 10 ──
+  7:[
+    {q:'In Exodus 12 (the Passover), what must the Israelites put on their doorposts so the angel of death passes over?',
+     opts:['Oil','The blood of a lamb','Ashes from the altar','Water from the Nile'], ans:1,
+     exp:'"When I see the blood, I will pass over you." The lamb\'s blood bringing deliverance powerfully foreshadows Christ, our Passover Lamb (Exodus 12:13).'},
+    {q:'In Exodus 14, how do the Israelites cross the Red Sea?',
+     opts:['God provides boats for them','God parts the waters and they walk through on dry ground','They swim across at night','God sends a bridge of clouds'], ans:1,
+     exp:'Moses stretched out his hand and the Lord drove the sea back. "The Israelites went through the sea on dry ground, with a wall of water on their right and on their left." (Exodus 14:21-22)'},
+    {q:'In Luke 18, Jesus tells a parable about persistent prayer. Who are the two characters?',
+     opts:['A king and a soldier','A widow and an unjust judge','A rich man and a poor beggar','A Pharisee and a tax collector'], ans:1,
+     exp:'A persistent widow kept seeking justice from an unjust judge until he gave in. "Will not God bring about justice for his chosen ones, who cry out to him day and night?" (Luke 18:7)'},
+    {q:'In Luke 19, a notorious tax collector climbs a tree to see Jesus. Who is he, and what does Jesus do?',
+     opts:['Matthew — Jesus calls him to follow','Bartimaeus — Jesus heals his eyes','Zacchaeus — Jesus invites himself to his home','Simon — Jesus renames him Peter'], ans:2,
+     exp:'"Zacchaeus, come down immediately. I must stay at your house today." He welcomed Jesus gladly, repaid fourfold those he had cheated, and salvation came to his house (Luke 19:5-9).'},
+    {q:'In Luke 22 at the Last Supper, what does Jesus say the cup represents?',
+     opts:['His joy shared with them','The new covenant in his blood poured out for them','The law of Moses fulfilled','The wine of the coming kingdom'], ans:1,
+     exp:'"This cup is the new covenant in my blood, which is poured out for you." Every time we take communion, we proclaim the Lord\'s death until he comes (Luke 22:20).'},
+    {q:'Psalm 31:15 says: "My times are in your ___."',
+     opts:['hands','will','plan','heart'], ans:0,
+     exp:'"My times are in your hands; deliver me from the hands of my enemies." A profound declaration of trust — God holds every moment of our lives.'},
+  ],
+  // ── WEEK 8 · Exod 17–22, John 1–4, Ps 34–36, Isa 11, Hos 11 ──
+  8:[
+    {q:'In John 1, John the Baptist points to Jesus and declares: "Look, the ___ of God, who takes away the sin of the world!"',
+     opts:['Son','Lamb','Light','Word'], ans:1,
+     exp:'"Look, the Lamb of God, who takes away the sin of the world!" (John 1:29) — connecting Jesus to the Passover lamb whose blood brought deliverance.'},
+    {q:'In John 2, Jesus performs his first miracle at a wedding in Cana. What does he do?',
+     opts:['Heals a man born blind','Turns water into wine','Feeds five thousand guests','Raises the host\'s son from the dead'], ans:1,
+     exp:'Jesus turned six stone jars of water (each holding 20-30 gallons) into the finest wine. This "first of his signs" revealed his glory and his disciples believed (John 2:11).'},
+    {q:'John 3:16 — "For God so loved the world that he gave his one and only Son, that whoever ___ in him shall not perish but have eternal life."',
+     opts:['prays','believes','repents','is baptised'], ans:1,
+     exp:'"...that whoever believes in him shall not perish but have eternal life." Possibly the most well-known verse in the Bible — the gospel in one sentence (John 3:16).'},
+    {q:'In Exodus 20, which is the FIRST of the Ten Commandments?',
+     opts:['Remember the Sabbath','You shall have no other gods before me','Do not take the Lord\'s name in vain','Honour your father and mother'], ans:1,
+     exp:'"You shall have no other gods before me." Exclusive devotion to God is the foundation of the entire covenant relationship (Exodus 20:3).'},
+    {q:'In John 4, Jesus speaks with a Samaritan woman at Jacob\'s well. What does he offer that means she will "never thirst again"?',
+     opts:['The bread of life','Living water','Eternal rest','The light of the world'], ans:1,
+     exp:'"The water I give them will become in them a spring of water welling up to eternal life." The woman left her water jar and ran to tell her whole town (John 4:14).'},
+    {q:'Isaiah 11 describes the Messiah\'s kingdom. What will the wolf do, and with whom?',
+     opts:['The wolf will be slain by the lamb','The wolf will live with the lamb','The wolf will flee before the lion','The wolf will be tamed by a child alone'], ans:1,
+     exp:'"The wolf will live with the lamb, the leopard will lie down with the goat." Isaiah 11 paints a breathtaking picture of perfect peace under the Messiah\'s rule.'},
+  ],
+  // ── WEEK 9 · Exod 23–28, John 5–10, Ps 37–39, Isa 12, Hos 12 ──
+  9:[
+    {q:'In John 6, after feeding 5,000, Jesus declares one of his "I am" statements. Which one?',
+     opts:['"I am the living water"','"I am the bread of life"','"I am the resurrection"','"I am the good shepherd"'], ans:1,
+     exp:'"I am the bread of life. Whoever comes to me will never go hungry." (John 6:35) — connecting to the manna God gave Israel in the desert (Exodus 16).'},
+    {q:'In John 8, religious leaders bring a woman caught in adultery. What does Jesus say to her accusers?',
+     opts:['"Apply the law of Moses to her"','"Let any one of you who is without sin be the first to throw a stone"','"Take her to the priests for judgment"','"She must confess publicly first"'], ans:1,
+     exp:'One by one they left. Jesus asked the woman "Has no one condemned you?" "No one, sir." "Then neither do I condemn you... go now and leave your life of sin." (John 8:10-11)'},
+    {q:'In Exodus 25, what was placed in the Most Holy Place of the tabernacle?',
+     opts:['The golden lampstand','The Ark of the Covenant covered by the mercy seat','The altar of incense','The table of showbread'], ans:1,
+     exp:'The Ark of the Covenant, topped with the mercy seat and two golden cherubim. God said: "There, above the cover, I will meet with you." (Exodus 25:22)'},
+    {q:'In John 9, Jesus heals a man born blind. When disciples ask whose sin caused his blindness, what does Jesus say?',
+     opts:['The parents sinned','The man sinned','Neither sinned — this happened so God\'s works might be displayed in him','It is a mystery known only to God'], ans:2,
+     exp:'"Neither this man nor his parents sinned, but this happened so that the works of God might be displayed in him." Jesus refuses the simple "sin = suffering" formula (John 9:3).'},
+    {q:'Psalm 37:4 — "Delight yourself in the Lord, and he will give you the ___ of your heart."',
+     opts:['peace','strength','desires','riches'], ans:2,
+     exp:'"Delight yourself in the Lord, and he will give you the desires of your heart." When our delight is in God, our desires begin to align with his will (Psalm 37:4).'},
+    {q:'In John 10, Jesus says "I am the good shepherd." What does he say the good shepherd does that a hired hand would not?',
+     opts:['Feeds them the finest grass','Lays down his life for the sheep','Keeps a perfect count of every sheep','Calls each sheep by name only'], ans:1,
+     exp:'"The good shepherd lays down his life for the sheep. The hired hand... abandons the sheep and runs away." (John 10:11-13) — pointing directly to the cross.'},
+  ],
+  // ── WEEK 10 · Exod 29–34, John 11–16, Ps 40–42, Isa 13, Hos 13 ──
+  10:[
+    {q:'In John 11, before raising Lazarus, Jesus makes a powerful declaration. What is it?',
+     opts:['"Lazarus, come back to life"','"I am the resurrection and the life"','"Your faith has made Lazarus well"','"Remove the stone and believe"'], ans:1,
+     exp:'"I am the resurrection and the life. The one who believes in me will live, even though they die." Jesus then wept — and then called Lazarus out of the tomb (John 11:25).'},
+    {q:'In Exodus 32, while Moses is on Sinai receiving the Law, what do the Israelites do?',
+     opts:['Build a place of prayer','Make and worship a golden calf','Fight with the Amalekites','Organise themselves by tribe'], ans:1,
+     exp:'"They have made themselves an idol cast in the shape of a calf." Moses came down and shattered the stone tablets in anger at their rapid unfaithfulness (Exodus 32:8,19).'},
+    {q:'In John 13, Jesus washes his disciples\' feet and gives a "new commandment." What is it?',
+     opts:['Keep the Sabbath holy','Love one another as I have loved you','Baptise all nations','Pray without ceasing'], ans:1,
+     exp:'"By this everyone will know that you are my disciples — if you love one another." Love that mirrors Christ\'s self-giving love is the mark of his followers (John 13:34-35).'},
+    {q:'In John 14, Jesus comforts his troubled disciples. What does he say about his Father\'s house?',
+     opts:['It is a kingdom on earth for Israel','It has many rooms and he is going to prepare a place for them','It is guarded by an army of angels','It will come down to earth at his return'], ans:1,
+     exp:'"My Father\'s house has many rooms... I am going there to prepare a place for you." The believer\'s eternal home is being prepared right now (John 14:2).'},
+    {q:'Psalm 42 opens with a beautiful image of spiritual longing. What is it?',
+     opts:['As an eagle soars, so my soul rises to you','As a dove searches for shelter, so I search for you','As a deer pants for streams of water, so my soul pants for you, O God','As a lion hungers for prey, so my heart hungers for you'], ans:2,
+     exp:'"As the deer pants for streams of water, so my soul pants for you, my God." (Psalm 42:1) — a profound picture of spiritual thirst and longing for God\'s presence.'},
+    {q:'In John 15, Jesus says "I am the true vine." What happens to branches that bear no fruit?',
+     opts:['They receive extra care and water','They are pruned lightly and left alone','They are cut off; those that bear fruit are pruned to bear even more','They are moved to better soil'], ans:2,
+     exp:'"Every branch in me that bears no fruit he cuts off, while every branch that does bear fruit he prunes so that it will be even more fruitful." Connection to Christ is everything (John 15:2).'},
+  ],
+  // ── WEEK 11 · Exod 35–40, John 17–21, Acts 1, Ps 43–45, Isa 14, Hos 14 ──
+  11:[
+    {q:'In John 17 (Jesus\' high priestly prayer), what is his central request for all believers?',
+     opts:['That they would have great power','That they may be one, as the Father and Son are one','That they would never suffer persecution','That they would return safely to Jerusalem'], ans:1,
+     exp:'"That all of them may be one, Father, just as you are in me and I am in you." Jesus prays for the unity of all believers — unity that flows from the Trinity itself (John 17:21).'},
+    {q:'In John 19, what does the sign on Jesus\' cross say?',
+     opts:['"This man is a criminal"','"Enemy of Caesar"','"Jesus of Nazareth, the King of the Jews"','"Crucified by order of Rome"'], ans:2,
+     exp:'"Jesus of Nazareth, the King of the Jews" — written in Aramaic, Latin, and Greek. Pilate refused to change it: "What I have written, I have written." (John 19:19-22)'},
+    {q:'In John 20, who is the first person to see the risen Jesus, and who does she at first mistake him for?',
+     opts:['Mary the mother of Jesus — she mistakes him for an angel','Mary Magdalene — she mistakes him for the gardener','Joanna — she mistakes him for a soldier','Salome — she mistakes him for Peter'], ans:1,
+     exp:'Mary Magdalene stood weeping at the tomb. When Jesus said "Mary," she cried "Rabboni!" (Teacher). She had mistaken him for the gardener (John 20:15-16).'},
+    {q:'In John 21, Jesus restores Peter beside the Sea of Galilee. How many times does he ask "Do you love me?"',
+     opts:['Once','Twice','Three times','Seven times'], ans:2,
+     exp:'Three times — mirroring Peter\'s three denials. Each time Peter answered, Jesus commissioned him: "Feed my lambs... Take care of my sheep... Feed my sheep." (John 21:15-17)'},
+    {q:'In Acts 1, just before ascending to heaven, what does Jesus tell his disciples?',
+     opts:['Return to Galilee and wait for me there','Go immediately to all the nations','You will receive power when the Holy Spirit comes and be my witnesses to the ends of the earth','Gather in Jerusalem until I return in glory'], ans:2,
+     exp:'"You will receive power when the Holy Spirit comes on you; and you will be my witnesses in Jerusalem, and in all Judea and Samaria, and to the ends of the earth." (Acts 1:8) — the mission of the church.'},
+    {q:'Hosea 14 ends with God\'s tender promise of restoration. What image does God use for what he will be to Israel?',
+     opts:['A mighty fortress and shield','A shepherd leading them home','I will be like dew to Israel — he will blossom like a lily','A consuming fire that purifies gold'], ans:2,
+     exp:'"I will be like the dew to Israel; he will blossom like a lily." After all the unfaithfulness, Hosea ends with grace and the promise of flourishing (Hosea 14:5). The book of Hosea is complete!'},
+  ],
+  // ── WEEK 12 · Lev 1–6, Acts 2–7, Ps 46–48, Isa 15, Joel 1 ──
+  12:[
+    {q:'In Acts 2 on the day of Pentecost, what dramatic event takes place?',
+     opts:['Jesus appears to the disciples one final time','The Holy Spirit comes as tongues of fire; the disciples speak in other languages and 3,000 are baptised','Peter is chosen as leader by casting lots','The disciples are all arrested by the Sanhedrin'], ans:1,
+     exp:'"They were filled with the Holy Spirit and began to speak in other tongues." Peter preached and about 3,000 people were added to the church that day (Acts 2:4,41).'},
+    {q:'Psalm 46:10 contains one of Scripture\'s most famous commands. What does God say?',
+     opts:['"Praise me with song and dance"','"Seek my face with all your heart"','"Be still, and know that I am God"','"Come to me all who are weary"'], ans:2,
+     exp:'"Be still, and know that I am God; I will be exalted among the nations." (Psalm 46:10) — an invitation to stop striving and rest in God\'s sovereignty.'},
+    {q:'In Acts 3, Peter and John heal a man at the Beautiful Gate of the temple. What is his condition?',
+     opts:['Blind from birth','Lame from birth — he had never walked','Deaf and mute','Suffering from leprosy'], ans:1,
+     exp:'"Instantly the man\'s feet and ankles became strong. He jumped to his feet and began to walk." He entered the temple walking, leaping, and praising God (Acts 3:7-8).'},
+    {q:'In Acts 5, Ananias and Sapphira lie about money from selling their land. What happens to them?',
+     opts:['They are expelled from the community','They are imprisoned by the apostles','Both fall down and die after being confronted','They are forgiven after confessing publicly'], ans:2,
+     exp:'Ananias fell dead when Peter exposed his lie. Three hours later Sapphira told the same lie and also fell dead. "Great fear seized the whole church." (Acts 5:5,11)'},
+    {q:'In Acts 7, Stephen becomes the first Christian martyr. What does he see just before he is stoned?',
+     opts:['A great white light from heaven','Angels blowing trumpets','The heavens opened and the Son of Man standing at the right hand of God','Moses and Elijah appearing beside him'], ans:2,
+     exp:'"Look, I see heaven open and the Son of Man standing at the right hand of God." Stephen prayed "Lord, do not hold this sin against them" — echoing Jesus on the cross (Acts 7:56,60).'},
+    {q:'Leviticus introduces the sacrificial system. What does Leviticus 1 say the burnt offering is to God?',
+     opts:['Payment for the priests\' wages','A pleasing aroma — an expression of total devotion to God','A celebration of the harvest','A tax owed to the tabernacle'], ans:1,
+     exp:'"It is a burnt offering, a food offering, an aroma pleasing to the Lord." (Leviticus 1:9) The entire animal was consumed — symbolising complete consecration and devotion to God.'},
   ],
 };
 
