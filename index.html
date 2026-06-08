@@ -605,6 +605,16 @@ const MINOR_PROPHETS = [
   {name:'Haggai',chs:2},{name:'Zechariah',chs:14},{name:'Malachi',chs:4},
 ];
 
+// Sun/Tue/Thu wisdom track: Psalms → Job → Proverbs (cycling)
+const PSALM_TRACK = [
+  {name:'Psalms',chs:150},{name:'Job',chs:42},{name:'Proverbs',chs:31},
+];
+// Mon/Wed/Fri wisdom track: Proverbs → Ecclesiastes → Song of Solomon → Psalms (cycling)
+const PROVERBS_TRACK = [
+  {name:'Proverbs',chs:31},{name:'Ecclesiastes',chs:12},
+  {name:'Song of Solomon',chs:8},{name:'Psalms',chs:150},
+];
+
 // Week 1 Sun=Makhulu Mon=Miranda Tue=Lunathi Wed=Makhulu Thu=Miranda Fri=Lunathi
 // Week 2 Sun=Miranda  Mon=Lunathi Tue=Makhulu Wed=Miranda  Thu=Lunathi Fri=Makhulu
 // Week 3 Sun=Lunathi  Mon=Makhulu Tue=Miranda Wed=Lunathi  Thu=Makhulu Fri=Miranda
@@ -645,12 +655,20 @@ function getOT(w, d) { return resolveSeq(OT_BOOKS, 24 + (w-1)*6 + d); }
 // Week 1 Day 0 = Matt 25 = NT flat index 24
 function getNT(w, d) { return resolveSeq(NT_BOOKS, 24 + (w-1)*6 + d); }
 
-// Sun/Tue/Thu → Psalm starting Ps 13 | Mon/Wed/Fri → Proverbs starting Pr 13
+// Sun/Tue/Thu → Psalm track | Mon/Wed/Fri → Proverbs track, both starting ch 13 in week 1
 function getPP(w, d) {
-  const psalm = d % 2 === 0;
-  const ch = 13 + Math.floor(d/2) + (w-1)*3;
-  if (psalm) return ch > 150 ? null : {type:'ps', label:`Psalm ${ch}`};
-  return ch > 31 ? null : {type:'pr', label:`Proverbs ${ch}`};
+  const idx = 12 + Math.floor(d/2) + (w-1)*3;
+  function bookTag(label) {
+    if (label.startsWith('Song')) return 'Song of Sol.';
+    return label.split(' ')[0];
+  }
+  if (d % 2 === 0) {
+    const label = resolveSeq(PSALM_TRACK, idx);
+    return {type:'ps', label, tag: bookTag(label)};
+  } else {
+    const label = resolveSeq(PROVERBS_TRACK, idx);
+    return {type:'pr', label, tag: bookTag(label)};
+  }
 }
 
 // Sabbath: Isaiah + Hosea, +1 chapter each week from ch 4
@@ -737,8 +755,8 @@ function renderRoster() {
     if (!isSab) {
       rHTML += row('ot',  '📖', day.ot,  'OT');
       if (day.pp) {
-        if (day.pp.type === 'ps') rHTML += row('ps','🎵', day.pp.label, 'Psalm');
-        else                       rHTML += row('pr','💡', day.pp.label, 'Proverbs');
+        if (day.pp.type === 'ps') rHTML += row('ps','🎵', day.pp.label, day.pp.tag);
+        else                       rHTML += row('pr','💡', day.pp.label, day.pp.tag);
       }
       rHTML += row('nt', '✝️', day.nt, 'NT');
     } else {
@@ -1015,7 +1033,7 @@ function toggleRev(i) {
 }
 
 // ═══════════════════════════════════════════
-//  QUIZ DATA  (weeks 1–12)
+//  QUIZ DATA  (weeks 1–12, 10 questions each)
 // ═══════════════════════════════════════════
 const QUIZ_DATA = {
   // ── WEEK 1 · Gen 25–30, Matt 25–28, Mark 1–2, Ps 13–15, Pr 13–15, Isa 4, Hos 4 ──
@@ -1038,6 +1056,18 @@ const QUIZ_DATA = {
     {q:'In Mark 1, what does Jesus immediately do after calling his first disciples?',
      opts:['Goes to Jerusalem','Casts out an unclean spirit in the synagogue','Feeds a multitude','Walks on water'], ans:1,
      exp:'In the synagogue at Capernaum, Jesus drove out an unclean spirit — amazing all who witnessed it (Mark 1:23-28).'},
+    {q:'In Matthew 25 (Parable of the Talents), what does the master call the servant who buried his talent instead of investing it?',
+     opts:['Foolish and unprepared','Wicked and lazy','Disobedient and fearful','Unworthy and unwise'], ans:1,
+     exp:'"You wicked, lazy servant!" The buried talent was taken and given to the one who had ten. Opportunity unused is opportunity lost (Matthew 25:26-29).'},
+    {q:'In Mark 2, when Jesus healed a paralyzed man lowered through the roof, what shocking thing did he say FIRST — before telling him to walk?',
+     opts:['"Take up your mat and walk"','Your faith has healed you"','"Your sins are forgiven"','"Rise and be well"'], ans:2,
+     exp:'Jesus said "Son, your sins are forgiven" first — which scandalized the religious leaders. Then, to prove his authority to forgive, he healed the man (Mark 2:5-11).'},
+    {q:'In Genesis 29, Jacob agrees to work 7 years for Rachel. Who does Laban give him instead on the wedding night?',
+     opts:['Zilpah','Bilhah','Leah','Dinah'], ans:2,
+     exp:'Laban deceived Jacob and gave him Leah the older daughter instead. When Jacob protested, Laban said the younger must not marry before the firstborn — a bitter echo of Jacob\'s own deception of his father (Gen 29:26).'},
+    {q:'Proverbs 14:12 gives a sobering warning. "There is a way that appears to be right, but in the end it leads to ___."',
+     opts:['regret','loss','death','darkness'], ans:2,
+     exp:'"There is a way that appears to be right, but in the end it leads to death." (Proverbs 14:12) Our own moral compass can be dangerously wrong. We need God\'s wisdom, not just our instincts.'},
   ],
   // ── WEEK 2 · Gen 31–36, Mark 3–8, Ps 16–18, Pr 16–18, Isa 5, Hos 5 ──
   2:[
@@ -1059,6 +1089,18 @@ const QUIZ_DATA = {
     {q:'Proverbs 18 says "death and life are in the power of…"',
      opts:['The heart','The mind','The tongue','The hand'], ans:2,
      exp:'"Death and life are in the power of the tongue, and those who love it will eat its fruit." (Proverbs 18:21)'},
+    {q:'In Genesis 31, who secretly takes Laban\'s household idols and hides them when Jacob\'s family flees?',
+     opts:['Leah','Rachel','Bilhah','Jacob himself'], ans:1,
+     exp:'Rachel stole her father\'s household gods — and when Laban searched, she sat on the camel saddle where she\'d hidden them and claimed she was menstruating so he couldn\'t make her stand up! (Genesis 31:19, 34)'},
+    {q:'In Mark 6, Jesus feeds 5,000 people with 5 loaves and 2 fish. How many baskets of leftovers were collected?',
+     opts:['5','7','12','40'], ans:2,
+     exp:'Twelve baskets of fragments remained — one possible echo of the twelve tribes of Israel. When God provides, nothing is wasted (Mark 6:43).'},
+    {q:'Psalm 16:8 — "I keep my eyes always on the Lord. With him at my ___, I will not be shaken."',
+     opts:['left hand','right hand','feet','side'], ans:1,
+     exp:'"With him at my right hand, I will not be shaken." The right hand is the position of honour and protection. Peter quoted this very verse in Acts 2 to prove Jesus\' resurrection (Psalm 16:8).'},
+    {q:'In Mark 3, Jesus gives James and John a special nickname. What is it, and what does it mean?',
+     opts:['Cephas — The Rock','Sons of Thunder — Boanerges','The Pillars — those who hold up the church','The Beloved — chosen above the rest'], ans:1,
+     exp:'"Boanerges, which means Sons of Thunder." James and John were known for their fiery temperament — the same two who later asked to call down fire from heaven on a Samaritan village (Mark 3:17, Luke 9:54).'},
   ],
   // ── WEEK 3 · Gen 37–42, Mark 9–14, Ps 19–21, Pr 19–21, Isa 6, Hos 6 ──
   3:[
@@ -1080,6 +1122,18 @@ const QUIZ_DATA = {
     {q:'Isaiah 6 records the prophet\'s response to God\'s call: "Here am I, ___"',
      opts:['"receive me"','"teach me"','"send me"','"lead me"'], ans:2,
      exp:'After the live coal purifies his lips, Isaiah responds: "Here am I. Send me!" — one of the most celebrated responses to divine calling in Scripture (Isaiah 6:8).'},
+    {q:'In Genesis 40, Joseph interprets dreams for two prisoners. What happens to the cupbearer vs. the baker after three days?',
+     opts:['Both are released and serve Pharaoh again','Both are executed','The cupbearer is restored; the baker is hanged','The baker is restored; the cupbearer is hanged'], ans:2,
+     exp:'Exactly as Joseph predicted: the chief cupbearer was restored to his position, and the chief baker was hanged. But the cupbearer forgot Joseph for two more years (Genesis 40:21-23).'},
+    {q:'In Mark 12, a teacher of the law asks which commandment is greatest. Jesus gives TWO. What are they?',
+     opts:['Keep the Sabbath holy, and honour your father and mother','Love God with all your heart, and love your neighbour as yourself','Do not murder, and do not steal','Worship God alone, and seek justice for the poor'], ans:1,
+     exp:'"The most important is: Love the Lord your God with all your heart, soul, mind and strength. The second is: Love your neighbour as yourself. There is no commandment greater than these." (Mark 12:29-31)'},
+    {q:'Psalm 22:1 contains words Jesus cried out on the cross. What are they?',
+     opts:['"Father, forgive them, for they know not what they do"','"My God, my God, why have you forsaken me?"','"Into your hands I commit my spirit"','"It is finished"'], ans:1,
+     exp:'"My God, my God, why have you forsaken me?" (Psalm 22:1). Jesus quoted this Psalm from the cross — Psalm 22 goes on to describe the crucifixion in vivid detail, hundreds of years before it happened (Mark 15:34).'},
+    {q:'Proverbs 21:2 — "A person may think their own ways are right, but the Lord weighs the ___."',
+     opts:['actions','words','heart','motives'], ans:2,
+     exp:'"The Lord weighs the heart." (Proverbs 21:2) God sees not just what we do, but why we do it. The same action can be worship or hypocrisy depending on what\'s in the heart.'},
   ],
   // ── WEEK 4 · Gen 43–48, Mark 15–16, Luke 1–4, Ps 22–24, Pr 22–24, Isa 7, Hos 7 ──
   4:[
@@ -1101,6 +1155,18 @@ const QUIZ_DATA = {
     {q:'In Luke 4, Jesus reads from Isaiah in the synagogue and declares: "Today this scripture is fulfilled in your ___."',
      opts:['generation','nation','hearing','presence'], ans:2,
      exp:'"Today this scripture is fulfilled in your hearing." The crowd marvelled at his words — until he challenged their expectations (Luke 4:21).'},
+    {q:'In Genesis 44, Joseph tests whether his brothers have truly changed by planting his silver cup in whose sack?',
+     opts:['Judah\'s','Reuben\'s','Simeon\'s','Benjamin\'s'], ans:3,
+     exp:'Joseph planted the cup in Benjamin\'s sack. Would his brothers abandon the youngest and save themselves — as they once abandoned Joseph? This time Judah offered himself as a slave in Benjamin\'s place. The change was real (Genesis 44:33).'},
+    {q:'In Genesis 46, how many people from Jacob\'s family went down to Egypt?',
+     opts:['40','70','12','120'], ans:1,
+     exp:'"All those who went to Egypt with Jacob — those who were his direct descendants — numbered seventy in all." (Genesis 46:27) From 70 people, God would build a nation of millions.'},
+    {q:'In Luke 2, where do Mary and Joseph find the 12-year-old Jesus after searching for three days?',
+     opts:['At the synagogue in Nazareth','In the market district of Jerusalem','Sitting among the teachers in the temple','At the home of relatives in Bethlehem'], ans:2,
+     exp:'Jesus was sitting among the teachers in the temple, "listening to them and asking them questions. Everyone who heard him was amazed at his understanding and his answers." (Luke 2:46-47)'},
+    {q:'Psalm 24:1 opens with a majestic declaration of ownership. What does it say?',
+     opts:['The heavens are the Lord\'s but the earth he gave to mankind','The earth is the Lord\'s, and everything in it — the world, and all who live in it','Israel belongs to the Lord, purchased with his mighty hand','God rules over all the nations from his holy mountain'], ans:1,
+     exp:'"The earth is the Lord\'s, and everything in it." (Psalm 24:1) Absolute ownership. We are not owners of anything — we are stewards of what belongs to God. This shapes how we hold possessions, money, and even our own lives.'},
   ],
   // ── WEEK 5 · Gen 49–50, Exod 1–4, Luke 5–10, Ps 25–27, Pr 25–27, Isa 8, Hos 8 ──
   5:[
@@ -1122,6 +1188,18 @@ const QUIZ_DATA = {
     {q:'Psalm 27:4 — What is the ONE thing David says he desires above all else?',
      opts:['Victory over all his enemies','To dwell in the house of the Lord all the days of his life','Long life and many descendants','Wisdom greater than Solomon\'s'], ans:1,
      exp:'"One thing I ask from the Lord… that I may dwell in the house of the Lord all the days of my life, to gaze on the beauty of the Lord." (Psalm 27:4) — an undivided heart.'},
+    {q:'In Exodus 2, Moses flees Egypt and helps seven daughters at a well. Whose daughters are they, and who does he marry?',
+     opts:['Jethro\'s daughters — he marries Zipporah','Hobab\'s daughters — he marries Miriam','Reuel\'s servants — he marries the eldest','Pharaoh\'s household — he marries no one'], ans:0,
+     exp:'Moses helped the daughters of Jethro (also called Reuel), the priest of Midian. He married Zipporah and had a son named Gershom. It was Jethro who later advised Moses to delegate leadership (Exodus 2:16-22, 18:17-23).'},
+    {q:'In Genesis 50, Joseph makes the most hopeful statement in the book. What does he say to his brothers about their betrayal?',
+     opts:['"You meant it for punishment, but God turned it to praise"','"You intended to harm me, but God intended it for good — to save many lives"','"What you did was evil, but I forgive you completely"','"God will repay you according to your deeds — I leave it in his hands"'], ans:1,
+     exp:'"You intended to harm me, but God intended it for good, to accomplish what is now being done, the saving of many lives." (Genesis 50:20) Perhaps the clearest statement of divine providence in the entire Old Testament.'},
+    {q:'In Luke 8, a woman healed by touching Jesus\' cloak in a crowd — what does Jesus say he felt leave him that revealed her healing?',
+     opts:['Energy','Warmth','Power','Light'], ans:2,
+     exp:'"Jesus realised that power had gone out from him." He turned and searched the crowd. When the woman fell at his feet, he said: "Daughter, your faith has healed you." (Luke 8:46-48) Faith, not just touch, was what connected her to his power.'},
+    {q:'Proverbs 25:11 compares the perfectly-timed word to something beautiful. What is the comparison?',
+     opts:['A lamp that lights a dark room','Like apples of gold in settings of silver','A gentle rain on parched ground','A sharp sword that cuts cleanly'], ans:1,
+     exp:'"Like apples of gold in settings of silver is a word aptly spoken." (Proverbs 25:11) The right word at the right moment is not just helpful — it is a work of art. Worth thinking carefully before we speak.'},
   ],
   // ── WEEK 6 · Exod 5–10, Luke 11–16, Ps 28–30, Pr 28–30, Isa 9, Hos 9 ──
   6:[
@@ -1143,6 +1221,18 @@ const QUIZ_DATA = {
     {q:'In Luke 16, what separates the rich man in torment from Lazarus in paradise?',
      opts:['A wall of fire','A great chasm that no one can cross','A river of water','Angels with flaming swords'], ans:1,
      exp:'"Between us and you a great chasm has been set in place, so that those who want to go from here to you cannot." The choices we make in this life have eternal consequences (Luke 16:26).'},
+    {q:'In Exodus 8–9, God makes a distinction from the flies plague onward. What is it?',
+     opts:['The plagues get more severe with each one','Only Egyptian firstborn sons are affected','The plagues do not touch Goshen where Israel lives','Israel must pay a ransom for protection'], ans:2,
+     exp:'"On that day I will deal differently with the land of Goshen, where my people live; no swarms of flies will be there." (Exodus 8:22) God was publicly demonstrating that his people are set apart — a foretaste of the cross.'},
+    {q:'In Luke 12, Jesus tells of a rich man who builds bigger barns to store his wealth. What does God say to him that very night?',
+     opts:['"Well done — now enjoy your harvest"','"Give it all away and follow me"','"You fool! This very night your life will be demanded from you"','"Your wealth cannot save you from the coming judgment"'], ans:2,
+     exp:'"You fool! This very night your life will be demanded from you. Then who will get what you have prepared for yourself? This is how it will be with whoever stores up things for themselves but is not rich toward God." (Luke 12:20-21)'},
+    {q:'Psalm 30:2 — "Lord my God, I called to you for help, and you ___."',
+     opts:['answered me with fire','healed me','sent an angel to me','gave me peace'], ans:1,
+     exp:'"Lord my God, I called to you for help, and you healed me." (Psalm 30:2) Psalm 30 is a song of grateful testimony — David was near death, he cried out, and God delivered him. Testimony fuels the faith of those who hear it.'},
+    {q:'Hosea 9 speaks of Israel\'s unfaithfulness. What central image does Hosea use throughout his whole book to describe how Israel treats God?',
+     opts:['A rebellious son who won\'t listen to his father','A treacherous soldier who deserts in battle','An unfaithful spouse who runs after other lovers','A wandering sheep lost far from home'], ans:2,
+     exp:'Throughout Hosea, Israel\'s idolatry is described as adultery — a wife who runs after other lovers. Hosea\'s own marriage to the unfaithful Gomer was a living parable of God\'s heartbreak and relentless love for his unfaithful people.'},
   ],
   // ── WEEK 7 · Exod 11–16, Luke 17–22, Ps 31–33, Pr 31, Isa 10, Hos 10 ──
   7:[
@@ -1164,6 +1254,18 @@ const QUIZ_DATA = {
     {q:'Psalm 31:15 says: "My times are in your ___."',
      opts:['hands','will','plan','heart'], ans:0,
      exp:'"My times are in your hands; deliver me from the hands of my enemies." A profound declaration of trust — God holds every moment of our lives.'},
+    {q:'In Exodus 12, God gives detailed instructions for the Passover. Which of these was NOT part of the instructions?',
+     opts:['Apply lamb\'s blood to the doorframe','Eat with sandals on, cloak tucked in, staff in hand — ready to go','Bring the meal to the tabernacle to be blessed by the priest','Eat unleavened bread'], ans:2,
+     exp:'There was no tabernacle yet! The Passover was eaten at home, standing, "in haste" — a dress rehearsal for departure. The haste of the first Passover should remind us that we too are pilgrims, not permanent residents here (Exodus 12:11).'},
+    {q:'In Exodus 15, after crossing the Red Sea, a prophetess leads the women in dancing and praise. Who is she?',
+     opts:['Rachel','Deborah','Miriam, Moses\' sister','Zipporah, Moses\' wife'], ans:2,
+     exp:'"Miriam the prophet, Aaron\'s sister, took a timbrel in her hand, and all the women followed her with timbrels and dancing." (Exodus 15:20) The same Miriam who hid in the reeds to watch over baby Moses now leads Israel in song.'},
+    {q:'In Luke 20, the religious leaders try to trap Jesus with a question about paying taxes to Caesar. What is his famous reply?',
+     opts:['"God owns everything — give it all to him"','"Give back to Caesar what is Caesar\'s, and to God what is God\'s"','"The law of Moses exempts Israel from Roman taxation"','"Pay your taxes so as not to cause trouble for the church"'], ans:1,
+     exp:'"Give back to Caesar what is Caesar\'s, and to God what is God\'s." (Luke 20:25) They could not catch him. The deeper question beneath his answer: are YOU giving God what belongs to him — yourself, made in his image?'},
+    {q:'Proverbs 31:10 opens the famous passage about the woman of noble character. What does it say she is worth?',
+     opts:['More than rubies','More than gold','More than silver and pearls','More than the finest jewels'], ans:0,
+     exp:'"A wife of noble character who can find? She is worth far more than rubies." (Proverbs 31:10) This poem describes not just a good wife but the ideal of faithful, industrious, God-fearing character — available to all who seek wisdom.'},
   ],
   // ── WEEK 8 · Exod 17–22, John 1–4, Ps 34–36, Isa 11, Hos 11 ──
   8:[
@@ -1185,6 +1287,18 @@ const QUIZ_DATA = {
     {q:'Isaiah 11 describes the Messiah\'s kingdom. What will the wolf do, and with whom?',
      opts:['The wolf will be slain by the lamb','The wolf will live with the lamb','The wolf will flee before the lion','The wolf will be tamed by a child alone'], ans:1,
      exp:'"The wolf will live with the lamb, the leopard will lie down with the goat." Isaiah 11 paints a breathtaking picture of perfect peace under the Messiah\'s rule.'},
+    {q:'In John 3, Jesus tells Nicodemus: "He must become greater; I must become ___." Who said this?',
+     opts:['Jesus — about God the Father','John the Baptist — about Jesus','Nicodemus — about Jesus','Peter — about his own ambitions'], ans:1,
+     exp:'"He must become greater; I must become less." (John 3:30) — John the Baptist. The greatest statement of humility in the Gospels, from the one Jesus called the greatest prophet born of women. A model for all who serve God.'},
+    {q:'In Exodus 17, while Joshua fought the Amalekites, Moses held up his staff. Why did it matter whether his hands were raised or lowered?',
+     opts:['The staff summoned divine fire when raised','When Moses\' hands were raised Israel won; when lowered, Amalek won — so Aaron and Hur held his arms up','The staff could only channel power when held high','Moses was calling down rain to hamper the enemy'],  ans:1,
+     exp:'"Whenever Moses held up his hands, Israel prevailed, and whenever he lowered his hands, Amalek prevailed." Aaron and Hur sat him on a stone and held his hands up until sunset — a powerful picture of intercessory prayer and community support (Exodus 17:11-12).'},
+    {q:'Psalm 34:8 gives a wonderful personal invitation. What does it say?',
+     opts:['"Come, let us bow down in worship before the Lord"','"Taste and see that the Lord is good; blessed is the one who takes refuge in him"','"Be still and know that I am God"','"Seek the Lord while he may be found; call on him while he is near"'], ans:1,
+     exp:'"Taste and see that the Lord is good." (Psalm 34:8) Not just believe it secondhand — TASTE it yourself. This is an invitation to personal, first-hand experience of God\'s goodness, not just inherited faith.'},
+    {q:'In John 1, John the Baptist says he is unworthy even to untie whose sandals?',
+     opts:['The Messiah whose name he does not know','The one who comes after him — Jesus','The Lord God who sent him','The prophet Elijah who is to come'], ans:1,
+     exp:'"The one who comes after me has surpassed me because he was before me... I am not worthy to untie the strap of his sandal." (John 1:27,30) Untying sandals was the task of the lowest slave. John says he\'s not even qualified for that.'},
   ],
   // ── WEEK 9 · Exod 23–28, John 5–10, Ps 37–39, Isa 12, Hos 12 ──
   9:[
@@ -1206,6 +1320,18 @@ const QUIZ_DATA = {
     {q:'In John 10, Jesus says "I am the good shepherd." What does he say the good shepherd does that a hired hand would not?',
      opts:['Feeds them the finest grass','Lays down his life for the sheep','Keeps a perfect count of every sheep','Calls each sheep by name only'], ans:1,
      exp:'"The good shepherd lays down his life for the sheep. The hired hand... abandons the sheep and runs away." (John 10:11-13) — pointing directly to the cross.'},
+    {q:'In Exodus 24, Moses and the elders of Israel go up Sinai and see God. What remarkable detail is given about what they saw beneath his feet?',
+     opts:['A blazing fire surrounded by thick smoke','Something like a pavement of lapis lazuli, as bright and blue as the sky','A golden throne surrounded by seraphim','A whirlwind of lightning from which his voice spoke'], ans:1,
+     exp:'"Under his feet was something like a pavement made of lapis lazuli, as bright blue as the sky." (Exodus 24:10) — one of the most vivid throne-room glimpses in the entire Old Testament. They "saw God, and they ate and drank" — a covenant meal in his presence.'},
+    {q:'In John 6, after Jesus\' hard bread-of-life teaching, many disciples leave. What does Peter say when Jesus asks if the Twelve will leave too?',
+     opts:['"We believe and know you are the Messiah"','"Where would we go? You have the words of eternal life"','"We will follow you even if we don\'t understand"','"Lord, increase our faith"'], ans:1,
+     exp:'"Simon Peter answered him, Lord, to whom shall we go? You have the words of eternal life." (John 6:68) When faith is tested and many leave, Peter\'s answer becomes our anchor: there is simply nowhere else to go.'},
+    {q:'Psalm 37:4 — "Delight yourself in the Lord, and he will give you the ___ of your heart."',
+     opts:['peace','strength','desires','riches'], ans:2,
+     exp:'"Delight yourself in the Lord, and he will give you the desires of your heart." (Psalm 37:4) Notice the order: delight in GOD first. When he is our delight, our desires begin to align with his — and then he can safely give them to us.'},
+    {q:'In John 9, the disciples see a man blind from birth and ask whose sin caused it. What does Jesus say?',
+     opts:['The parents sinned and God punished the child','The man sinned in a previous life','Neither — this happened so that the works of God might be displayed in him','It is a mystery not given to us to understand'], ans:2,
+     exp:'"Neither this man nor his parents sinned, but this happened so that the works of God might be displayed in him." (John 9:3) Jesus refuses the simple "sin = suffering" formula. Sometimes God allows suffering so that his glory can be revealed through it.'},
   ],
   // ── WEEK 10 · Exod 29–34, John 11–16, Ps 40–42, Isa 13, Hos 13 ──
   10:[
@@ -1227,6 +1353,18 @@ const QUIZ_DATA = {
     {q:'In John 15, Jesus says "I am the true vine." What happens to branches that bear no fruit?',
      opts:['They receive extra care and water','They are pruned lightly and left alone','They are cut off; those that bear fruit are pruned to bear even more','They are moved to better soil'], ans:2,
      exp:'"Every branch in me that bears no fruit he cuts off, while every branch that does bear fruit he prunes so that it will be even more fruitful." Connection to Christ is everything (John 15:2).'},
+    {q:'In John 12, who objects when Mary anoints Jesus with expensive perfume — and what is their real motive, revealed by John?',
+     opts:['Peter — genuinely concerned about the poor','Thomas — he thought it was socially inappropriate','Judas Iscariot — not because he cared about the poor, but because he was a thief who helped himself to the money bag','Martha — she thought Mary should be helping serve the guests'], ans:2,
+     exp:'"He did not say this because he cared about the poor but because he was a thief; as keeper of the money bag, he used to help himself to what was put into it." (John 12:6) John exposes the gap between what we say and what we actually want.'},
+    {q:'In Exodus 33, after the golden calf disaster, Moses makes an extraordinary request of God. What does he ask?',
+     opts:['To see the plan God has written for Israel\'s future','To see a vision of the promised land from above','To see God\'s glory','To have an angel lead them instead of God leaving'], ans:2,
+     exp:'"Now show me your glory." God replied: "I will cause all my goodness to pass in front of you... but you cannot see my face, for no one may see me and live." (Exodus 33:18-20) Moses wanted more of God even in the wake of Israel\'s worst failure. So should we.'},
+    {q:'Psalm 40:1-3 — David waited patiently for the Lord. What did God do for him?',
+     opts:['He silenced all his enemies immediately','He gave him great wealth and renown','He lifted him out of the slimy pit, set his feet on a rock, and put a new song in his mouth','He sent an angel to fight his battles for him'], ans:2,
+     exp:'"He lifted me out of the slimy pit, out of the mud and mire; he set my feet on a rock and gave me a firm place to stand. He put a new song in my mouth." (Psalm 40:2-3) Patient waiting on God is never wasted — it always ends with a new song.'},
+    {q:'John 14:6 — Jesus makes one of his most exclusive claims. What does he say?',
+     opts:['"I am the bread of life; no one who comes to me will ever go hungry"','"I am the way and the truth and the life. No one comes to the Father except through me."','"I am the resurrection; whoever believes in me, even if they die, will live"','"I am the light of the world; whoever follows me will never walk in darkness"'], ans:1,
+     exp:'"I am the way and the truth and the life. No one comes to the Father except through me." (John 14:6) Not a way, not a truth — THE way. One of Jesus\' seven great "I AM" declarations in John\'s Gospel, each echoing God\'s name from Exodus 3:14.'},
   ],
   // ── WEEK 11 · Exod 35–40, John 17–21, Acts 1, Ps 43–45, Isa 14, Hos 14 ──
   11:[
@@ -1248,6 +1386,15 @@ const QUIZ_DATA = {
     {q:'Hosea 14 ends with God\'s tender promise of restoration. What image does God use for what he will be to Israel?',
      opts:['A mighty fortress and shield','A shepherd leading them home','I will be like dew to Israel — he will blossom like a lily','A consuming fire that purifies gold'], ans:2,
      exp:'"I will be like the dew to Israel; he will blossom like a lily." After all the unfaithfulness, Hosea ends with grace and the promise of flourishing (Hosea 14:5). The book of Hosea is complete!'},
+    {q:'In John 19, John says Jesus said "I am thirsty" so that scripture would be fulfilled. Which Psalm predicted this detail?',
+     opts:['Psalm 19 — "let the words of my mouth be acceptable"','Psalm 22 (mouth dried up like clay) and Psalm 69 (they gave me vinegar for my thirst)','Psalm 31 — "into your hands I commit my spirit"','Psalm 40 — "he put a new song in my mouth"'], ans:1,
+     exp:'"Later, knowing that everything had now been finished, and so that Scripture would be fulfilled, Jesus said, \'I am thirsty.\'" (John 19:28) — fulfilling Psalm 22:15 and Psalm 69:21. Even his thirst on the cross was foreseen and written down centuries earlier.'},
+    {q:'In John 21, Jesus restores Peter by asking him the same question three times. Why three times?',
+     opts:['To establish the covenant pattern of three','Because three witnesses are required in Jewish law','To mirror Peter\'s three denials — one restoration for each denial','To give Peter three chances to prove his love publicly'], ans:2,
+     exp:'"Do you love me?" asked three times — once for each denial around the charcoal fire (John 18:25-27 / John 21:9,15-17). Each time Peter answered, Jesus gave him a commission: "Feed my lambs... tend my sheep... feed my sheep." Restoration comes with responsibility.'},
+    {q:'Psalm 45:6 contains a verse that the book of Hebrews applies directly to Jesus. What is remarkable about it?',
+     opts:['It calls the king "Son of the Most High" in the same breath as "son of David"','It addresses the king directly as "O God" — "Your throne, O God, will last forever"','It says the king will be born of a virgin in the city of David','It promises the king will rule all nations from Jerusalem'], ans:1,
+     exp:'"Your throne, O God, will last for ever and ever." (Psalm 45:6) A royal wedding song that addresses the king as "God." Hebrews 1:8 quotes this verse as applying to Jesus — proof that his divine nature was embedded in Israel\'s worship long before the Incarnation.'},
   ],
   // ── WEEK 12 · Lev 1–6, Acts 2–7, Ps 46–48, Isa 15, Joel 1 ──
   12:[
@@ -1269,6 +1416,18 @@ const QUIZ_DATA = {
     {q:'Leviticus introduces the sacrificial system. What does Leviticus 1 say the burnt offering is to God?',
      opts:['Payment for the priests\' wages','A pleasing aroma — an expression of total devotion to God','A celebration of the harvest','A tax owed to the tabernacle'], ans:1,
      exp:'"It is a burnt offering, a food offering, an aroma pleasing to the Lord." (Leviticus 1:9) The entire animal was consumed — symbolising complete consecration and devotion to God.'},
+    {q:'In Acts 4, after Peter and John are arrested, the Sanhedrin is astonished by something about them. What is it?',
+     opts:['They had memorised the entire Torah','Their courage — they were "unschooled, ordinary men" who had been with Jesus','They spoke in languages no one in the council had heard','They performed a miracle right in front of the council'], ans:1,
+     exp:'"When they saw the courage of Peter and John and realised that they were unschooled, ordinary men, they were astonished and they took note that these men had been with Jesus." (Acts 4:13) The Holy Spirit transforms ordinary people into extraordinary witnesses.'},
+    {q:'Leviticus 6:13 contains a commandment about the fire on the altar. What does it say, and what does it picture for us?',
+     opts:['The fire must be started fresh each morning with newly cut wood','The fire must be kept burning on the altar continuously; it must not go out','Only the high priest may add wood to the fire','The fire must be extinguished on the Sabbath and relit at sunset'], ans:1,
+     exp:'"The fire must be kept burning on the altar continuously; it must not go out." (Leviticus 6:13) A beautiful picture for us: the fire of devotion to God — prayer, worship, Scripture — must be kept burning. Never let your walk with God grow cold.'},
+    {q:'Psalm 47:2 — "For the Lord Most High is ___."',
+     opts:['"holy and just, the defender of Israel"','"awesome, the great King over all the earth"','"faithful for ever, the shield of his people"','"sovereign, enthroned above the cherubim"'], ans:1,
+     exp:'"For the Lord Most High is awesome, the great King over all the earth." (Psalm 47:2) This is a psalm for ALL nations to sing — God\'s kingship extends far beyond Israel. Every nation, every family is invited to "clap their hands" before him.'},
+    {q:'In Joel 1, a devastating locust plague hits the land and Joel calls it a sign from God. What does he call the people to do in response?',
+     opts:['Go immediately to fight the locusts off','Sacrifice at the tabernacle as usual','Mourn, fast, and gather the elders and all inhabitants to the house of God — a national call to repentance','Wait patiently for the Lord to restore what the locusts have eaten'], ans:2,
+     exp:'"Declare a holy fast; call a sacred assembly. Summon the elders and all who live in the land to the house of the Lord your God." (Joel 1:14) National calamity is a call to national repentance. Joel 2:28-29 later promises the Spirit poured out on all — quoted by Peter at Pentecost.'},
   ],
 };
 
