@@ -666,14 +666,10 @@ const MINOR_PROPHETS = [
   {name:'Haggai',chs:2},{name:'Zechariah',chs:14},{name:'Malachi',chs:4},
 ];
 
-const WISDOM_TRACK1 = [
-  {name:'Psalms',chs:150},{name:'Job',chs:42},{name:'Proverbs',chs:31},
-  {name:'Ecclesiastes',chs:12},{name:'Song of Solomon',chs:8},
-];
-const WISDOM_TRACK2 = [
-  {name:'Proverbs',chs:31},{name:'Ecclesiastes',chs:12},
-  {name:'Song of Solomon',chs:8},{name:'Psalms',chs:150},
-  {name:'Job',chs:42},
+const WISDOM_BOOKS = [
+  {name:'Psalms',chs:150},{name:'Proverbs',chs:31},
+  {name:'Song of Solomon',chs:8},{name:'Job',chs:42},
+  {name:'Ecclesiastes',chs:12},
 ];
 
 // Week 1 Sun=Makhulu Mon=Miranda Tue=Lunathi Wed=Makhulu Thu=Miranda Fri=Lunathi
@@ -719,21 +715,13 @@ function buildReading(books, startIndex, week, day) {
   return resolveCycle(books, startIndex + (week - 1) * 6 + day);
 }
 
-function buildCycledReading(books, startIndex, week, day) {
-  const readingIndex = startIndex + (week - 1) * 3 + Math.floor(day / 2);
-  return resolveCycle(books, readingIndex);
-}
-
 function getOT(week, day) { return buildReading(OT_BOOKS, 24, week, day); }
 function getNT(week, day) { return buildReading(NT_BOOKS, 24, week, day); }
 
 function getPP(week, day) {
-  if (day % 2 === 0) {
-    const label = buildCycledReading(WISDOM_TRACK1, 12, week, day);
-    return {type:'ps', label, tag: bookName(label)};
-  }
-  const label = buildCycledReading(WISDOM_TRACK2, 12, week, day);
-  return {type:'pr', label, tag: bookName(label)};
+  const label = buildReading(WISDOM_BOOKS, 12, week, day);
+  const type = day % 2 === 0 ? 'ps' : 'pr';
+  return {type, label, tag: bookName(label)};
 }
 
 function getSabbathProphets(week) {
@@ -923,20 +911,17 @@ function renderProgress() {
   const {weekNum, dayOfWeek} = getTodayInfo();
   const completedWeeks = Math.max(0, weekNum - 1);
   const scheduledDays = completedWeeks * 6 + Math.min(dayOfWeek + 1, 6);
-  const wisdom1Days = completedWeeks * 3 + [1,1,2,2,3,3,3][dayOfWeek];
-  const wisdom2Days = completedWeeks * 3 + [0,1,1,2,2,3,3][dayOfWeek];
   const sabbaths = completedWeeks + (dayOfWeek === 6 ? 1 : 0);
 
   const totalOT = OT_BOOKS.reduce((sum, book) => sum + book.chs, 0);
   const totalNT = NT_BOOKS.reduce((sum, book) => sum + book.chs, 0);
-  const totalWisdom1 = WISDOM_TRACK1.reduce((sum, book) => sum + book.chs, 0);
-  const totalWisdom2 = WISDOM_TRACK2.reduce((sum, book) => sum + book.chs, 0);
+  const totalWisdom = WISDOM_BOOKS.reduce((sum, book) => sum + book.chs, 0);
   const totalMajor = MAJOR_PROPHETS.reduce((sum, book) => sum + book.chs, 0);
   const totalMinor = MINOR_PROPHETS.reduce((sum, book) => sum + book.chs, 0);
 
   const otRead = Math.min(scheduledDays, totalOT - 24);
   const ntRead = Math.min(scheduledDays, totalNT - 24);
-  const wisdomRead = Math.min(wisdom1Days, totalWisdom1 - 12) + Math.min(wisdom2Days, totalWisdom2 - 12);
+  const wisdomRead = Math.min(scheduledDays, totalWisdom - 12);
   const majorRead = Math.min(sabbaths, totalMajor - 3);
   const minorRead = Math.min(sabbaths, totalMinor - 3);
   const completedMarks = countCompletedDays();
@@ -944,7 +929,7 @@ function renderProgress() {
   const items = [
     {name:'Old Testament', read: otRead, total: totalOT - 24, desc:'OT chapters from Genesis 25 onward'},
     {name:'New Testament', read: ntRead, total: totalNT - 24, desc:'NT chapters from Matthew 25 onward'},
-    {name:'Wisdom readings', read: wisdomRead, total: (totalWisdom1 - 12) + (totalWisdom2 - 12), desc:'Wisdom passages across Psalms, Proverbs, Job, Ecclesiastes and Song'},
+    {name:'Wisdom readings', read: wisdomRead, total: totalWisdom - 12, desc:'Wisdom passages through Psalms, Proverbs, Song of Solomon, Job and Ecclesiastes in order'},
     {name:'Major prophets', read: majorRead, total: totalMajor - 3, desc:'Sabbath major prophet chapters starting in Isaiah 4'},
     {name:'Minor prophets', read: minorRead, total: totalMinor - 3, desc:'Sabbath minor prophet chapters starting in Hosea 4'},
     {name:'Saved cards', read: Math.min(completedMarks, Math.max(1, scheduledDays)), total: Math.max(1, scheduledDays), desc:'Days you have marked complete in the app'},
@@ -1080,7 +1065,7 @@ function generateQuizData(week) {
 
   const otBooks = OT_BOOKS.map(book => book.name);
   const ntBooks = NT_BOOKS.map(book => book.name);
-  const wisdomBooks = [...new Set(WISDOM_TRACK1.concat(WISDOM_TRACK2).map(book => book.name))];
+  const wisdomBooks = WISDOM_BOOKS.map(book => book.name);
   const majorBooks = MAJOR_PROPHETS.map(book => book.name);
   const minorBooks = MINOR_PROPHETS.map(book => book.name);
 
