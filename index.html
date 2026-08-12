@@ -716,7 +716,7 @@ function bookName(ref) {
 }
 
 function buildReading(books, startIndex, week, day) {
-  return resolveSeq(books, startIndex + (week - 1) * 6 + day);
+  return resolveCycle(books, startIndex + (week - 1) * 6 + day);
 }
 
 function buildCycledReading(books, startIndex, week, day) {
@@ -738,8 +738,8 @@ function getPP(week, day) {
 
 function getSabbathProphets(week) {
   return {
-    major: resolveSeq(MAJOR_PROPHETS, 3 + (week - 1)),
-    minor: resolveSeq(MINOR_PROPHETS, 3 + (week - 1)),
+    major: resolveCycle(MAJOR_PROPHETS, 3 + (week - 1)),
+    minor: resolveCycle(MINOR_PROPHETS, 3 + (week - 1)),
   };
 }
 
@@ -947,7 +947,7 @@ function renderProgress() {
     {name:'Wisdom readings', read: wisdomRead, total: (totalWisdom1 - 12) + (totalWisdom2 - 12), desc:'Wisdom passages across Psalms, Proverbs, Job, Ecclesiastes and Song'},
     {name:'Major prophets', read: majorRead, total: totalMajor - 3, desc:'Sabbath major prophet chapters starting in Isaiah 4'},
     {name:'Minor prophets', read: minorRead, total: totalMinor - 3, desc:'Sabbath minor prophet chapters starting in Hosea 4'},
-    {name:'Saved cards', read: completedMarks, total: Math.max(1, scheduledDays), desc:'Days you have marked complete in the app'},
+    {name:'Saved cards', read: Math.min(completedMarks, Math.max(1, scheduledDays)), total: Math.max(1, scheduledDays), desc:'Days you have marked complete in the app'},
   ];
 
   document.getElementById('progressGrid').innerHTML = items.map(item => {
